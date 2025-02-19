@@ -16,7 +16,6 @@ import {S3BucketOrigin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { BucketDeployment, CacheControl, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { CloudFrontTarget } from 'aws-cdk-lib/aws-route53-targets';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
-import { HttpsRedirect } from "aws-cdk-lib/aws-route53-patterns";
 
 export interface CognitoStackProps extends StackProps {
   fullDomainName: string;
