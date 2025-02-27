@@ -16,7 +16,6 @@ export interface CertificateStackProps extends StackProps {
 
 export class Certificate extends Stack {
   public readonly certificate: ICertificate;
-  public readonly wafArn: string;
 
   constructor(scope: Construct, id: string, props: CertificateStackProps) {
     super(scope, id, props);

@@ -16,7 +16,7 @@ const handleAxiosRequest = <T>(
     return data;
   });
 
-  // eslint-disable-next-line
+  // // eslint-disable-next-line
   // @ts-expect-error Required by Orval https://orval.dev/guides/custom-axios
   promise.cancel = () => {
     source.cancel("Query was cancelled by React Query");
