@@ -1,0 +1,623 @@
+Resources:
+  demoapilambdaroleEE7D9850:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: demo-api/demo-api-lambda-role/Resource
+  demoapilambda54A4FB5A:
+    Type: AWS::Lambda::Function
+    Properties:
+      Architectures:
+        - arm64
+      Code:
+        S3Bucket:
+          Fn::Sub: cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}
+        S3Key: b687a62617b5375588667b1b1d7b0d8852d0e9b2f8ec07de8e02e71ea4d6926d.zip
+      Handler: cmd
+      MemorySize: 256
+      Role:
+        Fn::GetAtt:
+          - demoapilambdaroleEE7D9850
+          - Arn
+      Runtime: provided.al2
+      Timeout: 60
+    DependsOn:
+      - demoapilambdaroleEE7D9850
+    Metadata:
+      aws:cdk:path: demo-api/demo-api-lambda/Resource
+      aws:asset:path: asset.b687a62617b5375588667b1b1d7b0d8852d0e9b2f8ec07de8e02e71ea4d6926d
+      aws:asset:is-bundled: false
+      aws:asset:property: Code
+  demoapilambdaInvokeFcyXBRX02EWa52GlFECQiCzDt0fdRUDi4mo4foC5aU0BBE994A:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - demoapilambda54A4FB5A
+          - Arn
+      Principal: apigateway.amazonaws.com
+    Metadata:
+      aws:cdk:path: demo-api/demo-api-lambda/InvokeFcyXBRX02EWa52GlF+ECQiCzDt0fdRUDi4mo4foC5aU=
+  demoapi7EEFB372:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+      Name: demo-api
+    Metadata:
+      aws:cdk:path: demo-api/demo-api/Resource
+  demoapiDeployment4278F7587d6eef20b9878d52b4f9fe2850d1bc64:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      Description: Automatically created by the RestApi construct
+      RestApiId:
+        Ref: demoapi7EEFB372
+    DependsOn:
+      - demoapiOPTIONS3C330389
+      - demoapiv1getlocationGETCB6C9A21
+      - demoapiv1getlocationOPTIONSB503763E
+      - demoapiv1getlocation62676EFC
+      - demoapiv1OPTIONSF7E11275
+      - demoapiv1postlocationOPTIONS5D6BBA09
+      - demoapiv1postlocationPost1D1C97EB
+      - demoapiv1postlocation7E6ED09B
+      - demoapiv191D2E9FC
+    Metadata:
+      aws:cdk:path: demo-api/demo-api/Deployment/Resource
+  demoapiDeploymentStageprod63D09AC1:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      DeploymentId:
+        Ref: demoapiDeployment4278F7587d6eef20b9878d52b4f9fe2850d1bc64
+      RestApiId:
+        Ref: demoapi7EEFB372
+      StageName: prod
+    Metadata:
+      aws:cdk:path: demo-api/demo-api/DeploymentStage.prod/Resource
+  demoapiOPTIONS3C330389:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: OPTIONS
+      Integration:
+        IntegrationResponses:
+          - ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'x-correlation-id,authorization,Content-Type'"
+              method.response.header.Access-Control-Allow-Origin: "'https://www.testawsreact.com'"
+              method.response.header.Vary: "'Origin'"
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+            ResponseTemplates:
+              application/json: |-
+                #set($origin = $input.params().header.get("Origin"))
+                #if($origin == "")
+                  #set($origin = $input.params().header.get("origin"))
+                #end
+                #if($origin == "http://localhost:3000")
+                  #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin)
+                #end
+            StatusCode: "204"
+        RequestTemplates:
+          application/json: "{ statusCode: 200 }"
+        Type: MOCK
+      MethodResponses:
+        - ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Origin: true
+            method.response.header.Vary: true
+            method.response.header.Access-Control-Allow-Methods: true
+          StatusCode: "204"
+      ResourceId:
+        Fn::GetAtt:
+          - demoapi7EEFB372
+          - RootResourceId
+      RestApiId:
+        Ref: demoapi7EEFB372
+    Metadata:
+      aws:cdk:path: demo-api/demo-api/Default/OPTIONS/Resource
+  demoapiv191D2E9FC:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Fn::GetAtt:
+          - demoapi7EEFB372
+          - RootResourceId
+      PathPart: v1
+      RestApiId:
+        Ref: demoapi7EEFB372
+    Metadata:
+      aws:cdk:path: demo-api/demo-api/Default/v1/Resource
+  demoapiv1OPTIONSF7E11275:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: OPTIONS
+      Integration:
+        IntegrationResponses:
+          - ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'x-correlation-id,authorization,Content-Type'"
+              method.response.header.Access-Control-Allow-Origin: "'https://www.testawsreact.com'"
+              method.response.header.Vary: "'Origin'"
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+            ResponseTemplates:
+              application/json: |-
+                #set($origin = $input.params().header.get("Origin"))
+                #if($origin == "")
+                  #set($origin = $input.params().header.get("origin"))
+                #end
+                #if($origin == "http://localhost:3000")
+                  #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin)
+                #end
+            StatusCode: "204"
+        RequestTemplates:
+          application/json: "{ statusCode: 200 }"
+        Type: MOCK
+      MethodResponses:
+        - ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Origin: true
+            method.response.header.Vary: true
+            method.response.header.Access-Control-Allow-Methods: true
+          StatusCode: "204"
+      ResourceId:
+        Ref: demoapiv191D2E9FC
+      RestApiId:
+        Ref: demoapi7EEFB372
+    Metadata:
+      aws:cdk:path: demo-api/demo-api/Default/v1/OPTIONS/Resource
+  demoapiv1getlocation62676EFC:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Ref: demoapiv191D2E9FC
+      PathPart: get-location
+      RestApiId:
+        Ref: demoapi7EEFB372
+    Metadata:
+      aws:cdk:path: demo-api/demo-api/Default/v1/get-location/Resource
+  demoapiv1getlocationOPTIONSB503763E:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: OPTIONS
+      Integration:
+        IntegrationResponses:
+          - ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'x-correlation-id,authorization,Content-Type'"
+              method.response.header.Access-Control-Allow-Origin: "'https://www.testawsreact.com'"
+              method.response.header.Vary: "'Origin'"
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+            ResponseTemplates:
+              application/json: |-
+                #set($origin = $input.params().header.get("Origin"))
+                #if($origin == "")
+                  #set($origin = $input.params().header.get("origin"))
+                #end
+                #if($origin == "http://localhost:3000")
+                  #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin)
+                #end
+            StatusCode: "204"
+        RequestTemplates:
+          application/json: "{ statusCode: 200 }"
+        Type: MOCK
+      MethodResponses:
+        - ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Origin: true
+            method.response.header.Vary: true
+            method.response.header.Access-Control-Allow-Methods: true
+          StatusCode: "204"
+      ResourceId:
+        Ref: demoapiv1getlocation62676EFC
+      RestApiId:
+        Ref: demoapi7EEFB372
+    Metadata:
+      aws:cdk:path: demo-api/demo-api/Default/v1/get-location/OPTIONS/Resource
+  demoapiv1getlocationGETApiPermissiondemoapi8770037AGETv1getlocationD3166654:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - demoapilambda54A4FB5A
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:"
+            - Ref: AWS::Partition
+            - ":execute-api:"
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":"
+            - Ref: demoapi7EEFB372
+            - /
+            - Ref: demoapiDeploymentStageprod63D09AC1
+            - /GET/v1/get-location
+    Metadata:
+      aws:cdk:path: demo-api/demo-api/Default/v1/get-location/GET/ApiPermission.demoapi8770037A.GET..v1.get-location
+  demoapiv1getlocationGETApiPermissionTestdemoapi8770037AGETv1getlocation7E35EBBD:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - demoapilambda54A4FB5A
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:"
+            - Ref: AWS::Partition
+            - ":execute-api:"
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":"
+            - Ref: demoapi7EEFB372
+            - /test-invoke-stage/GET/v1/get-location
+    Metadata:
+      aws:cdk:path: demo-api/demo-api/Default/v1/get-location/GET/ApiPermission.Test.demoapi8770037A.GET..v1.get-location
+  demoapiv1getlocationGETCB6C9A21:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId:
+        Ref: demoapiapiauth
+      HttpMethod: GET
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri:
+          Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - ":apigateway:"
+              - Ref: AWS::Region
+              - :lambda:path/2015-03-31/functions/
+              - Fn::GetAtt:
+                  - demoapilambda54A4FB5A
+                  - Arn
+              - /invocations
+      ResourceId:
+        Ref: demoapiv1getlocation62676EFC
+      RestApiId:
+        Ref: demoapi7EEFB372
+    Metadata:
+      aws:cdk:path: demo-api/demo-api/Default/v1/get-location/GET/Resource
+  demoapiv1postlocation7E6ED09B:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Ref: demoapiv191D2E9FC
+      PathPart: post-location
+      RestApiId:
+        Ref: demoapi7EEFB372
+    Metadata:
+      aws:cdk:path: demo-api/demo-api/Default/v1/post-location/Resource
+  demoapiv1postlocationOPTIONS5D6BBA09:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: OPTIONS
+      Integration:
+        IntegrationResponses:
+          - ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'x-correlation-id,authorization,Content-Type'"
+              method.response.header.Access-Control-Allow-Origin: "'https://www.testawsreact.com'"
+              method.response.header.Vary: "'Origin'"
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+            ResponseTemplates:
+              application/json: |-
+                #set($origin = $input.params().header.get("Origin"))
+                #if($origin == "")
+                  #set($origin = $input.params().header.get("origin"))
+                #end
+                #if($origin == "http://localhost:3000")
+                  #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin)
+                #end
+            StatusCode: "204"
+        RequestTemplates:
+          application/json: "{ statusCode: 200 }"
+        Type: MOCK
+      MethodResponses:
+        - ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Origin: true
+            method.response.header.Vary: true
+            method.response.header.Access-Control-Allow-Methods: true
+          StatusCode: "204"
+      ResourceId:
+        Ref: demoapiv1postlocation7E6ED09B
+      RestApiId:
+        Ref: demoapi7EEFB372
+    Metadata:
+      aws:cdk:path: demo-api/demo-api/Default/v1/post-location/OPTIONS/Resource
+  demoapiv1postlocationPostApiPermissiondemoapi8770037APOSTv1postlocationA32386F8:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - demoapilambda54A4FB5A
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:"
+            - Ref: AWS::Partition
+            - ":execute-api:"
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":"
+            - Ref: demoapi7EEFB372
+            - /
+            - Ref: demoapiDeploymentStageprod63D09AC1
+            - /POST/v1/post-location
+    Metadata:
+      aws:cdk:path: demo-api/demo-api/Default/v1/post-location/Post/ApiPermission.demoapi8770037A.POST..v1.post-location
+  demoapiv1postlocationPostApiPermissionTestdemoapi8770037APOSTv1postlocation7FF4BEA7:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - demoapilambda54A4FB5A
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:"
+            - Ref: AWS::Partition
+            - ":execute-api:"
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":"
+            - Ref: demoapi7EEFB372
+            - /test-invoke-stage/POST/v1/post-location
+    Metadata:
+      aws:cdk:path: demo-api/demo-api/Default/v1/post-location/Post/ApiPermission.Test.demoapi8770037A.POST..v1.post-location
+  demoapiv1postlocationPost1D1C97EB:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId:
+        Ref: demoapiapiauth
+      HttpMethod: POST
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri:
+          Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - ":apigateway:"
+              - Ref: AWS::Region
+              - :lambda:path/2015-03-31/functions/
+              - Fn::GetAtt:
+                  - demoapilambda54A4FB5A
+                  - Arn
+              - /invocations
+      ResourceId:
+        Ref: demoapiv1postlocation7E6ED09B
+      RestApiId:
+        Ref: demoapi7EEFB372
+    Metadata:
+      aws:cdk:path: demo-api/demo-api/Default/v1/post-location/Post/Resource
+  demoapibasepathmappingF9CE205D:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      BasePath: demo-api
+      DomainName: api.testawsreact.com
+      RestApiId:
+        Ref: demoapi7EEFB372
+      Stage:
+        Ref: demoapiDeploymentStageprod63D09AC1
+    Metadata:
+      aws:cdk:path: demo-api/demo-api-base-path-mapping/Resource
+  demoapiauthlambdarole909F13B1:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: demo-api/demo-api-auth-lambda-role/Resource
+  demoapiauthlambdaroleDefaultPolicy860EC7DF:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - lambda:InvokeFunction
+              - sts:AssumeRole
+            Effect: Allow
+            Resource: "*"
+        Version: "2012-10-17"
+      PolicyName: demoapiauthlambdaroleDefaultPolicy860EC7DF
+      Roles:
+        - Ref: demoapiauthlambdarole909F13B1
+    Metadata:
+      aws:cdk:path: demo-api/demo-api-auth-lambda-role/DefaultPolicy/Resource
+  demoapiapiauth:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      IdentitySource: method.request.header.Authorization
+      Name:
+        Fn::ImportValue: demo-cognito:ExportsOutputRefdemocognitoDevicePool974C64B929791DEE
+      ProviderARNs:
+        - Fn::Join:
+            - ""
+            - - "arn:aws:cognito-idp:"
+              - Ref: AWS::Region
+              - ":"
+              - Ref: AWS::AccountId
+              - :userpool/
+              - Fn::ImportValue: demo-cognito:ExportsOutputRefdemocognitoDevicePool974C64B929791DEE
+      RestApiId:
+        Ref: demoapi7EEFB372
+      Type: COGNITO_USER_POOLS
+    Metadata:
+      aws:cdk:path: demo-api/demo-api-api-auth
+  CDKMetadata:
+    Type: AWS::CDK::Metadata
+    Properties:
+      Analytics: v2:deflate64:H4sIAAAAAAAA/+1WW0/bMBT+LeRxMhlsD9t4C+xWDWhVeEMIGfs0NTi258tYFvW/c+zEoVAktD1MICFVSv0d+1y+8/nyrtz98Knc2aI3bpvx620pLsvuxFN2TRC66ARtym6uJZx1BXUuNMD322KvK4wViglDZcWYDsoXe8Wbggxz4oKKeaFVglekaKiiNfCZloIJcMUe+lvH2soOc89X5P+G4vxU94Y4dR3McTesHglaTpQUCkYbOnzCeE4OFirmS3o8ouOCUx0tG342Yc6xPR4aUN4NKSXHvc8VkbS55LTsvgaVaMHqvWhAh8ybTQ7T3wYabdsT8ScDTPP8d0kVl2DzIuQdvWTqLVsKD8wHCwOVMYUcMqUDthHO4WhF3PsLbBZ4V1bxg+NyP7Br8PvUwdk5oUbUWNINbcvuMKU/B+crIzB3DgsapJ8oD7WlY58xo37KMW0ez9hY/RupX1DpgGQ3B9q6mYWFFPXST01056LEqJT6ZmpFLeK4rzFC34FysC5LCxQ3Wih0oxaiDjkfZLg1SWnF/Mu3yfS4OsRmxW49/yR7UfZpks9gpG6jtBLzjllh1ijHPo3keyrU3fQcfNg5h7oWjMoJf7CjXiqeSLqrluAOrCFRlKG1XZCMBCnVwTJIEo+blxyBX2p+lkSRTFkR3pveNgBiQ+t6TQQBZ1rcsfb+aJJXZyitP8WWZ11g935AO4efQVjgo+genx/PhpgSlmEw8nCMOjx5gju4OyTsYJ5RixL3owp79SOXR/e8/K0T8krWK1nPmqyHtT1B4mr12qaX0aZ0lPeBxrMcczfUwvgCNdQvMWc/Xn7/bM23cApD4p0xQ/sRNUaoGsNeDsj9t88w4rrBy3h8Y/TOHviIUDWWic0Za0ou4v2U3mbx8hqmT4M3wa+IwkaVV+7tr92PJf52tq6cENvDg7Cc999bFFn8q0gMAAA=
+    Metadata:
+      aws:cdk:path: demo-api/CDKMetadata/Default
+    Condition: CDKMetadataAvailable
+Outputs:
+  demoapiEndpoint4A922513:
+    Value:
+      Fn::Join:
+        - ""
+        - - https://
+          - Ref: demoapi7EEFB372
+          - .execute-api.
+          - Ref: AWS::Region
+          - "."
+          - Ref: AWS::URLSuffix
+          - /
+          - Ref: demoapiDeploymentStageprod63D09AC1
+          - /
+Conditions:
+  CDKMetadataAvailable:
+    Fn::Or:
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - af-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-3
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-south-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-3
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-4
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ca-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ca-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-northwest-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-central-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-south-2
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-3
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - il-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - me-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - me-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - sa-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-west-1
+      - Fn::Equals:
+          - Ref: AWS::Region
+          - us-west-2
+Parameters:
+  BootstrapVersion:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /cdk-bootstrap/hnb659fds/version
+    Description: Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]

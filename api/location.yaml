@@ -1,0 +1,117 @@
+openapi: 3.0.0
+info:
+  description: Test Event Bus
+  version: 1.0.0
+  title: Cadence Demo
+servers:
+  - url: "https://api.spm-dev.com/bm-accounting-location"
+security:
+  - cognito: []
+paths:
+  "/v1/location":
+    get:
+      security:
+        - cognito: []
+      description: "Returns Locations"
+      operationId: getLocation
+      responses:
+        "200":
+          description: Locations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Location"
+    post:
+      security:
+        - cognito: []
+      description: "Updates Location"
+      operationId: postLocation
+      requestBody:
+        description: UpdateLocation
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Location"
+      responses:
+        "200":
+          description: Status
+components:
+  securitySchemes:
+    cognito:
+      type: apiKey
+      name: Authorization
+      in: header
+      x-amazon-apigateway-authtype: cognito_user_pools
+      x-amazon-apigateway-authorizer:
+        providerARNs:
+          - Fn::Sub: arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${userpoolid}
+        type: cognito_user_pools
+  schemas:
+    Location:
+      type: object
+      required:
+        - town
+        - openDays
+        - addressLine1
+        - facia
+        - postCode
+        - id
+        - products
+      properties:
+        products:
+          type: array
+          items:
+            type: string
+        addressLine1:
+          type: string
+        disabledAccess:
+          type: string
+        facia:
+          type: string
+        id:
+          type: string
+        openDays:
+          type: object
+          required:
+            - monday
+            - tuesday
+            - wednesday
+            - thursday
+            - friday
+            - saturday
+            - sunday
+          properties:
+            monday:
+              "$ref": "#/components/schemas/day"
+            tuesday:
+              "$ref": "#/components/schemas/day"
+            wednesday:
+              "$ref": "#/components/schemas/day"
+            thursday:
+              "$ref": "#/components/schemas/day"
+            friday:
+              "$ref": "#/components/schemas/day"
+            saturday:
+              "$ref": "#/components/schemas/day"
+            sunday:
+              "$ref": "#/components/schemas/day"
+        postCode:
+          type: string
+        town:
+          type: string
+    day:
+      type: object
+      required:
+        - start
+        - end
+        - open
+      properties:
+        end:
+          type: string
+        open:
+          type: boolean
+        start:
+          type: string

@@ -3,6 +3,7 @@ import * as cdk from "aws-cdk-lib";
 import { SinglePageApp } from "../lib/deploy-stack";
 import { Certificate } from "../lib/certificate";
 import { Cognito } from "../lib/cognito";
+import { DemoAPI } from "../lib/api";
 
 const app = new cdk.App();
 
@@ -21,6 +22,16 @@ const certificate = new Certificate(app, "demo-certificate", {
   crossRegionReferences: true,
 });
 
+const apiCertificate = new Certificate(app, "api-certificate", {
+  domainName: `api.${zoneName}`,
+  zoneId,
+  zoneName,
+  env: {
+    region: "eu-west-1",
+  },
+  crossRegionReferences: true,
+});
+
 new SinglePageApp(app, "demo-website", {
   fullDomainName: fullDomain,
   subdomainName: subdomain,
@@ -33,7 +44,23 @@ new SinglePageApp(app, "demo-website", {
   },
 });
 
-new Cognito(app, "demo-cognito", {
+const cognito = new Cognito(app, "demo-cognito", {
   fullDomain: fullDomain,
   zoneName: zoneName,
+  crossRegionReferences: true,
+  env: {
+    region: "eu-west-1",
+  },
+});
+
+new DemoAPI(app, "demo-api", {
+  fullDomain: fullDomain,
+  zoneId: zoneId,
+  zoneName: zoneName,
+  userPoolId: cognito.userPool.userPoolId,
+  apiCertificate: apiCertificate.certificate,
+  crossRegionReferences: true,
+  env: {
+    region: "eu-west-1",
+  },
 });

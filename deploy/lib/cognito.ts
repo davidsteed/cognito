@@ -12,10 +12,11 @@ export interface CognitoStackProps extends StackProps {
 }
 
 export class Cognito extends Stack {
+  public readonly userPool: cognito.UserPool;
   constructor(scope: Construct, id: string, props: CognitoStackProps) {
     super(scope, id, props);
 
-    const pool = new cognito.UserPool(this, id + "DevicePool", {
+    this.userPool = new cognito.UserPool(this, id + "DevicePool", {
       userPoolName: id + "UserPool",
       signInAliases: {
         username: true,
@@ -42,7 +43,7 @@ export class Cognito extends Stack {
     });
 
     const client = new cognito.CfnUserPoolClient(this, id + "AppClient", {
-      userPoolId: pool.userPoolId,
+      userPoolId: this.userPool.userPoolId,
       clientName: "SPMClient",
       supportedIdentityProviders: ["COGNITO"],
       callbackUrLs: ["https://" + props.fullDomain],
@@ -63,7 +64,7 @@ export class Cognito extends Stack {
     // Create Resource Server
     const cognitoAPIDomain = "auth." + props.zoneName;
     new cognito.CfnUserPoolResourceServer(this, id + "ResourceServer", {
-      userPoolId: pool.userPoolId,
+      userPoolId: this.userPool.userPoolId,
       identifier: cognitoAPIDomain,
       name: id,
       scopes: [
@@ -71,7 +72,9 @@ export class Cognito extends Stack {
       ],
     });
 
-    new CfnOutput(this, `${id}-UserPoolId`, { value: pool.userPoolId });
+    new CfnOutput(this, `${id}-UserPoolId`, {
+      value: this.userPool.userPoolId,
+    });
     new CfnOutput(this, `${id}-ClientId`, { value: client.ref });
   }
 }
