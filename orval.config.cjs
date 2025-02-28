@@ -10,7 +10,7 @@ module.exports = {
       override: {
         mutator: {
           path: "./mutator/customInstance.ts",
-          name: "customInstance",
+          name: "customMutator",
         },
         query: {
           useQuery: true,

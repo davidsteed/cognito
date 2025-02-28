@@ -3,7 +3,13 @@ import AcmeLogo from "@/app/ui/acme-logo";
 import { Suspense } from "react";
 import { Authenticator } from "@aws-amplify/ui-react";
 import { Amplify } from "aws-amplify";
+import { Button } from "@/app/ui/button";
+import { useAuthenticator } from "@aws-amplify/ui-react";
+import { useGetLocation } from "@/app/generator";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "@aws-amplify/ui-react/styles.css";
+
+//const baseURL = 'https://api.testawsreact.com';
 
 Amplify.configure({
   Auth: {
@@ -13,6 +19,28 @@ Amplify.configure({
     },
   },
 });
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+const App = () => {
+  const { authStatus } = useAuthenticator((context) => [context.authStatus]);
+  const { isLoading: isBranchDetailsLoading } = useGetLocation({});
+
+  return (
+    <div>
+      <h1>
+        Hello {authStatus} {isBranchDetailsLoading}
+      </h1>
+    </div>
+  );
+};
+
 export default function LoginPage() {
   return (
     <main className="flex items-center justify-center md:h-screen">
@@ -22,16 +50,19 @@ export default function LoginPage() {
             <AcmeLogo />
           </div>
         </div>
-        <Suspense>
-          <Authenticator hideSignUp>
-            {({ signOut, user }) => (
-              <main>
-                <h1>Hello {user?.username}</h1>
-                <button onClick={signOut}>Sign out</button>
-              </main>
-            )}
-          </Authenticator>
-        </Suspense>
+        <QueryClientProvider client={queryClient}>
+          <Suspense>
+            <Authenticator hideSignUp>
+              {({ signOut, user }) => (
+                <main>
+                  <h1>Hello {user?.username}</h1>
+                  <App></App>
+                  <Button onClick={signOut}>Sign out</Button>
+                </main>
+              )}
+            </Authenticator>
+          </Suspense>
+        </QueryClientProvider>
       </div>
     </main>
   );

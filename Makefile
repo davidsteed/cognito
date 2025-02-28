@@ -6,7 +6,12 @@ PROJECT_ROOT = github.com/davidsteed/cognito
 
 .PHONY: build
 build:
-	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -tags lambda.norpc -ldflags "-X main.Version=`git rev-parse --short HEAD`" -a -o ./build ./cmd/
+	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -tags lambda.norpc -ldflags "-X main.Version=`git rev-parse --short HEAD`" -a -o ./build/bootstrap ./cmd/
+	yarn && yarn build
+
+.PHONY: deploy
+deploy: build
+	cd deploy ; yarn build ; npx cdk deploy -c zoneId=ZJP01E7QBLR9Q -c zoneName=testawsreact.com -c subdomain=www --all; cd ..
 
 .PHONY: run
 run:
@@ -22,4 +27,4 @@ tidy:
 openapi-build:
 	echo $(APISPEC)
 	oapi-codegen --config ./config.yaml  $(OPENAPI)> $(OPENAPIDIR)/location.gen.go
-	npx --yes orval@6.19.1 --config ./orval.config.cjs
+	npx --yes orval@7.6.0 --config ./orval.config.cjs

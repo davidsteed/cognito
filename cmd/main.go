@@ -52,7 +52,7 @@ func main() {
 
 	// this is mapped via api gateway custom domain
 	// Log.Fatal("update basepath for api gateway custom domain and remove this line")
-	echoLambda.StripBasePath("demoapi")
+	echoLambda.StripBasePath("demo-api")
 
 	// start service for local development
 	if Version == "dev" {

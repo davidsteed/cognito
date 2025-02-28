@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   title: Cadence Demo
 servers:
-  - url: "https://api.spm-dev.com/bm-accounting-location"
+  - url: "https://api.testreactapp.com/demo-api"
 security:
   - cognito: []
 paths:

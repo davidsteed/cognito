@@ -36,15 +36,11 @@ export class Cognito extends Stack {
         requireUppercase: true,
         requireSymbols: true,
       },
-      // lambdaTriggers: {
-      //   preAuthentication: dummyLambda,
-      //   preSignUp: dummyLambda,
-      // },
     });
 
     const client = new cognito.CfnUserPoolClient(this, id + "AppClient", {
       userPoolId: this.userPool.userPoolId,
-      clientName: "SPMClient",
+      clientName: "Client",
       supportedIdentityProviders: ["COGNITO"],
       callbackUrLs: ["https://" + props.fullDomain],
       allowedOAuthFlows: ["implicit"],
@@ -62,15 +58,15 @@ export class Cognito extends Stack {
     });
 
     // Create Resource Server
-    const cognitoAPIDomain = "auth." + props.zoneName;
-    new cognito.CfnUserPoolResourceServer(this, id + "ResourceServer", {
-      userPoolId: this.userPool.userPoolId,
-      identifier: cognitoAPIDomain,
-      name: id,
-      scopes: [
-        { scopeName: "deviceAccess", scopeDescription: "Access Device APIs" },
-      ],
-    });
+    // const cognitoAPIDomain = "auth." + props.zoneName;
+    // new cognito.CfnUserPoolResourceServer(this, id + "ResourceServer", {
+    //   userPoolId: this.userPool.userPoolId,
+    //   identifier: cognitoAPIDomain,
+    //   name: id,
+    //   scopes: [
+    //     { scopeName: "deviceAccess", scopeDescription: "Access Device APIs" },
+    //   ],
+    // });
 
     new CfnOutput(this, `${id}-UserPoolId`, {
       value: this.userPool.userPoolId,

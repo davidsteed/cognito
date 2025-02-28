@@ -1,38 +1,44 @@
-import Axios, { AxiosRequestConfig, AxiosResponse, AxiosInstance } from "axios";
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import { fetchAuthSession } from "@aws-amplify/core";
+import { AxiosError } from "@/app/utils";
 
-const baseApiUrl = "localhost";
-export const AXIOS_INSTANCE = Axios.create({ baseURL: baseApiUrl });
+const customInstance = axios.create({
+  baseURL: "https://api.testawsreact.com/demo-api",
+});
 
-const handleAxiosRequest = <T>(
-  axiosInstance: AxiosInstance,
+// Add auth token to every request
+customInstance.interceptors.request.use(async (config) => {
+  try {
+    const session = await fetchAuthSession();
+    const token = session.tokens?.idToken?.toString();
+
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  } catch (error) {
+    console.warn("No auth token available", error);
+  }
+
+  return config;
+});
+
+export default customInstance;
+
+export type ErrorType<E = unknown> = AxiosError<E>;
+
+// ✅ Ensure `customMutator` is strictly typed
+export const customMutator: <T>(
   config: AxiosRequestConfig,
+  options?: Record<string, unknown>,
+) => Promise<T> = async <T>(
+  config: AxiosRequestConfig,
+  options?: Record<string, unknown>,
 ): Promise<T> => {
-  const source = Axios.CancelToken.source();
-  const promise = axiosInstance({
+  const response: AxiosResponse<T> = await customInstance.request<T>({
     ...config,
-    cancelToken: source.token,
-  }).then((res: AxiosResponse<T>) => {
-    const { data } = res;
-    return data;
+    ...(options as object), // Prevents `any` inference
   });
 
-  // // eslint-disable-next-line
-  // @ts-expect-error Required by Orval https://orval.dev/guides/custom-axios
-  promise.cancel = () => {
-    source.cancel("Query was cancelled by React Query");
-  };
-  return promise;
+  return response.data;
 };
-
-export const customInstance = <T>(config: AxiosRequestConfig): Promise<T> => {
-  return handleAxiosRequest(AXIOS_INSTANCE, config);
-};
-
-interface AxiosError<T> {
-  config: AxiosRequestConfig;
-  code?: string;
-  request?: unknown;
-  response?: AxiosResponse<T>;
-}
-
-export type ErrorType<Error> = AxiosError<Error>;

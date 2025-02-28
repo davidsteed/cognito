@@ -54,7 +54,6 @@ const cognito = new Cognito(app, "demo-cognito", {
 });
 
 new DemoAPI(app, "demo-api", {
-  fullDomain: fullDomain,
   zoneId: zoneId,
   zoneName: zoneName,
   userPoolId: cognito.userPool.userPoolId,
